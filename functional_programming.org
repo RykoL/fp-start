@@ -86,6 +86,9 @@ console.log(result)
 
 So as we can see this simple abstraction allows us to do composition in a given ~context~, in this case the ~Box~.
 
+
+* Functional error handling
+
 ** Capturing nullable values in a safe context
 
 #+begin_src js
