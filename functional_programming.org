@@ -6,6 +6,25 @@
 ** Step one: Imperative code
 What we see in this example is a function that takes a string containing a number, parses it into an int, increments and then turns it back into a char.
 
+#+begin_src js file:box1.js
+const nextCharForNumberString = (str) => {
+    const trimmed = str.trim()
+    const number = parseInt(trimmed)
+    const incremented = number + 1
+    return String.fromCharCode(incremented)
+}
+
+const result = nextCharForNumberString(' 64')
+
+console.log(result)
+#+end_src
+
+#+RESULTS:
+: A
+: undefined
+
+** Step two: composing
+
 While this code is perfectly fine, i think we can improve this. As we see this code is made up of multiple ~transformations~ that depend on an earlier transformation. Is there a way we can compose them ?
 
 #+begin_src js file:box1.js
@@ -26,7 +45,7 @@ console.log(result)
 : A
 : undefined
 
-** Step two: The Box type
+** Step three: The Box type
 
 Using a list every time we wan't to compose transformation doesn't seem right though. So lets just create our own type !
 
@@ -174,3 +193,6 @@ class Left {
     }
 }
 #+end_src
+
+#+RESULTS:
+: undefined
