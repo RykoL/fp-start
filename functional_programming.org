@@ -1,0 +1,176 @@
+#+title: Functional Programming
+
+* Thinking in boxes
+
+
+** Step one: Imperative code
+What we see in this example is a function that takes a string containing a number, parses it into an int, increments and then turns it back into a char.
+
+While this code is perfectly fine, i think we can improve this. As we see this code is made up of multiple ~transformations~ that depend on an earlier transformation. Is there a way we can compose them ?
+
+#+begin_src js file:box1.js
+const nextCharForNumberString = (str) => {
+    return [str]
+        .map(s => s.trim())
+        .map(parseInt)
+        .map(num => num + 1)
+        .map(num => String.fromCharCode(num))[0]
+}
+
+const result = nextCharForNumberString(' 64')
+
+console.log(result)
+#+end_src
+
+#+RESULTS:
+: A
+: undefined
+
+** Step two: The Box type
+
+Using a list every time we wan't to compose transformation doesn't seem right though. So lets just create our own type !
+
+#+begin_src js file:box1.js
+
+class Box {
+    constructor(value) {
+        this.value = value
+    }
+
+    map(f) {
+        return new Box(f(this.value))
+    }
+
+    fold(f) {
+        return f(this.value)
+    }
+}
+
+
+const nextCharForNumberString = (str) => {
+    return new Box(str)
+        .map(s => s.trim())
+        .map(parseInt)
+        .map(num => num + 1)
+        .map(num => String.fromCharCode(num))
+        .fold(c => c)
+}
+
+const result = nextCharForNumberString(' 64')
+
+console.log(result)
+#+end_src
+
+#+RESULTS:
+: A
+: undefined
+
+So as we can see this simple abstraction allows us to do composition in a given ~context~, in this case the ~Box~.
+
+** Capturing nullable values in a safe context
+
+#+begin_src js
+
+//const Option = Some(a) | None
+
+const fromNullable = (value) => {
+    if (value === undefined) {
+        return new None
+    }
+
+    return new Some(value)
+}
+
+class Some {
+    constructor(value) {
+        this.value = value
+    }
+
+    map(f) {
+        return new Some(f(this.value))
+    }
+
+    getOrElse(_f) {
+        return this.value
+    }
+}
+
+class None {
+    map() {
+        return this
+    }
+
+    getOrElse(f) {
+        return f()
+    }
+}
+
+
+const somePlant = {
+    scientific_name: "Aa argyrolepis",
+    family: "Orchidaceae",
+    genus: "Aa"
+}
+
+const christmasTree = {
+    commonName: "Christmastree",
+    scientific_name: "Abies alba",
+    family: "Pinaceae",
+    genus: "Abies"
+}
+
+const getCommonName = (plant) => {
+    return fromNullable(plant.commonName)
+}
+
+const christmasTreeName = getCommonName(christmasTree)
+    .map(commonName => commonName.toUpperCase())
+    .getOrElse(() => {})
+
+const somePlantName = getCommonName(somePlant)
+    .map(commonName => commonName.toUpperCase())
+    .getOrElse(() => "Plant has no common name")
+
+console.log(christmasTreeName)
+console.log(somePlantName)
+console.log("Succeeded")
+#+end_src
+
+#+RESULTS:
+: CHRISTMASTREE
+: Plant has no common name
+: Succeeded
+: undefined
+
+** Handling errors in a world without exceptions
+
+#+begin_src js
+
+class Right {
+    constructor(value) {
+        this.value = value
+    }
+
+    map(f) {
+        return new Right(f(this.value))
+    }
+
+    flatMap(f) {
+        return f(this.value)
+    }
+}
+
+class Left {
+    constructor(value) {
+        this.value = value
+    }
+
+    map(f) {
+        return this
+    }
+
+    flatMap(f) {
+        return this
+    }
+}
+#+end_src
