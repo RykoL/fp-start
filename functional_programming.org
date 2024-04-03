@@ -253,3 +253,10 @@ getCurrentUser()
 :   { id: 1, name: 'Use stoicism for a happier life' }
 : ]
 : undefined
+
+* Resources
+
+- https://egghead.io/lessons/javascript-linear-data-flow-with-container-style-types-box
+- https://arrow-kt.io/
+- https://www.youtube.com/watch?v=ppN9nrh5Mu8
+- https://kotlinlang.org/docs/sealed-classes.html#declare-a-sealed-class-or-interface
