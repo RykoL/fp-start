@@ -180,6 +180,10 @@ class Right {
     flatMap(f) {
         return f(this.value)
     }
+
+    fold(ifLeft, ifRight) {
+        return ifRight(this.value)
+    }
 }
 
 class Left {
@@ -194,8 +198,58 @@ class Left {
     flatMap(f) {
         return this
     }
+
+    fold(ifLeft, ifRight) {
+        return ifLeft(this.value)
+    }
 }
+
+const getCurrentUser = () => {
+    return new Right({
+        id: 1,
+        name: "Rico",
+    })
+}
+
+const getOtherUser = () => {
+    return new Right({
+        id: 0,
+        name: "Peter",
+    })
+}
+
+const getPostsForUser = (userId) => {
+    if (userId === 1) {
+        return new Right(
+            Array.of(
+                {id: 0, name: "Thinking in Boxes"},
+                {id: 1, name: "Use stoicism for a happier life"},
+            )
+        )
+    }
+
+    return new Left("Access denied")
+}
+
+getOtherUser()
+    .map(user => user.id)
+    .flatMap(getPostsForUser)
+    .fold(err => {
+        console.info("Encountered error:", err)
+    }, console.info)
+
+getCurrentUser()
+    .map(user => user.id)
+    .flatMap(getPostsForUser)
+    .fold(console.warn, data => {
+        console.info("Retrieved data: ", data)
+    })
 #+end_src
 
 #+RESULTS:
+: Encountered error: Access denied
+: Retrieved data:  [
+:   { id: 0, name: 'Thinking in Boxes' },
+:   { id: 1, name: 'Use stoicism for a happier life' }
+: ]
 : undefined
